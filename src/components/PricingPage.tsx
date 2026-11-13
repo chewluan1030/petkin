@@ -162,7 +162,7 @@ export function PricingPage({
             Monthly Membership Plans
           </h2>
           <p className="mt-1.5 text-sm text-[#57605A]">
-            Membership pricing and benefits are proposed business-plan examples until confirmed by Found U.
+            Membership pricing and benefits are proposed business-plan examples until confirmed by PetKin.
           </p>
         </div>
 
@@ -292,7 +292,7 @@ export function PricingPage({
               Membership Governance &amp; Pricing Note
             </p>
             <p className="mt-1">
-              Membership pricing and benefits are proposed business-plan examples until confirmed by Found U. All live service prices and plan changes saved by authorised administrators in the database update automatically on this page.
+              Membership pricing and benefits are proposed business-plan examples until confirmed by PetKin. All live service prices and plan changes saved by authorised administrators in the database update automatically on this page.
             </p>
           </div>
         </div>

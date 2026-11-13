@@ -22,9 +22,9 @@ import type {
 import { ResilientImage } from './ResilientImage';
 
 const GROOMING_STUDIO_IMAGE =
-  '/src/assets/images/service_grooming_studio_1794556925919.jpg';
+  '/src/assets/images/calm_grooming_studio_1794559412119.jpg';
 const HOTEL_SUITES_IMAGE =
-  '/src/assets/images/service_hotel_suites_1794556926851.jpg';
+  '/src/assets/images/sanctuary_pet_suites_1794559413937.jpg';
 
 interface ServicesPageProps {
   onNavigate: (tab: NavTab) => void;

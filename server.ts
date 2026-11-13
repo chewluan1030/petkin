@@ -2,7 +2,6 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import { and, eq } from 'drizzle-orm';
-import { createServer as createViteServer } from 'vite';
 import { db } from './src/db/index.ts';
 import {
   ConflictError,
@@ -39,9 +38,18 @@ import {
   matchPetWithGemini,
   type MatcherUserProfile,
 } from './src/server/geminiMatcher.ts';
+import healthHandler from './api/health.ts';
+import chatHandler from './api/chat.ts';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
+app.use(
+  '/src/assets/images',
+  express.static(path.resolve(process.cwd(), 'src/assets/images'))
+);
+
+app.all('/api/health', (req, res) => healthHandler(req, res));
+app.all('/api/chat', (req, res) => chatHandler(req, res));
 
 // 1. getPets(filters) — Adoption Database
 app.get('/api/pets', async (req, res) => {
@@ -457,8 +465,8 @@ app.post('/api/admin/pets', requireAuth, requireAdmin, async (req, res) => {
         photoUrl:
           String(photoUrl || '').trim() ||
           (petType === 'Cat'
-            ? '/src/assets/images/pet_milo_cat_1794556923564.jpg'
-            : '/src/assets/images/pet_kopi_dog_1794556923240.jpg'),
+            ? '/src/assets/images/milo_ginger_cat_1794559410234.jpg'
+            : '/src/assets/images/kopi_singapore_dog_1794559410382.jpg'),
         personality: String(personality),
         specialCare: String(specialCare),
         hdbSuitable: Boolean(hdbSuitable),
@@ -549,7 +557,7 @@ app.post('/api/admin/hotels', requireAuth, requireAdmin, async (req, res) => {
         location: String(location),
         acceptsDogs: Boolean(acceptsDogs),
         acceptsCats: Boolean(acceptsCats),
-        photoUrl: '/src/assets/images/service_hotel_suites_1794556926851.jpg',
+        photoUrl: '/src/assets/images/sanctuary_pet_suites_1794559413937.jpg',
         roomTypes: [
           {
             name: String(roomName || 'Standard Comfort Suite'),
@@ -612,7 +620,7 @@ app.post('/api/admin/grooming', requireAuth, requireAdmin, async (req, res) => {
         location: String(location),
         servesDogs: Boolean(servesDogs),
         servesCats: Boolean(servesCats),
-        photoUrl: '/src/assets/images/service_grooming_studio_1794556925919.jpg',
+        photoUrl: '/src/assets/images/calm_grooming_studio_1794559412119.jpg',
         packages: [
           {
             id: `pkg-${Date.now()}`,
@@ -744,8 +752,9 @@ app.patch(
 );
 
 async function startServer() {
-  const port = 3000;
+  const port = Number(process.env.PORT) || 3000;
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',

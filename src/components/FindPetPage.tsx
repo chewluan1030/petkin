@@ -28,7 +28,7 @@ const FILTER_OPTIONS: { id: FilterId; label: string }[] = [
   { id: 'kids', label: 'Good with Kids' },
 ];
 
-const HERO_IMAGE = '/src/assets/images/hero_hdb_family_dog_1794556922664.jpg';
+const HERO_IMAGE = '/src/assets/images/hero_family_dog_1794559409325.jpg';
 
 interface FindPetPageProps {
   onNavigate: (tab: NavTab) => void;
