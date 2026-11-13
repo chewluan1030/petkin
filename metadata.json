@@ -1,0 +1,6 @@
+{
+  "name": "PetKin",
+  "description": "One-stop pet care services platform in Singapore: pet hotels, grooming services, and free shelter adoption matching powered by Cloud SQL and Gemini AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
