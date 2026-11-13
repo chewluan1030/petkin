@@ -1,5 +1,11 @@
 import { and, asc, desc, eq, inArray } from 'drizzle-orm';
-import { db } from './index.ts';
+import { db, isDatabaseConfigured } from './index.ts';
+import {
+  FALLBACK_PRICING,
+  filterFallbackGrooming,
+  filterFallbackHotels,
+  filterFallbackPets,
+} from '../server/fallbackCatalog.ts';
 import {
   adoptionEnquiries,
   bookings,
@@ -34,6 +40,9 @@ export interface PetFilters {
 }
 
 export async function getPets(filters: PetFilters = {}) {
+  if (!isDatabaseConfigured()) {
+    return filterFallbackPets(filters);
+  }
   try {
     const rows = await db
       .select({
@@ -88,8 +97,8 @@ export async function getPets(filters: PetFilters = {}) {
       return true;
     });
   } catch (error) {
-    console.error('getPets failed:', error);
-    throw new Error('Unable to retrieve adoption listings.', { cause: error });
+    console.warn('getPets falling back to verified catalog:', error);
+    return filterFallbackPets(filters);
   }
 }
 
@@ -112,6 +121,9 @@ export interface HotelFilters {
 }
 
 export async function getPetHotels(filters: HotelFilters = {}) {
+  if (!isDatabaseConfigured()) {
+    return filterFallbackHotels(filters);
+  }
   try {
     const hotels = await db
       .select()
@@ -197,8 +209,8 @@ export async function getPetHotels(filters: HotelFilters = {}) {
       return true;
     });
   } catch (error) {
-    console.error('getPetHotels failed:', error);
-    throw new Error('Unable to retrieve pet hotel listings.', { cause: error });
+    console.warn('getPetHotels falling back to verified catalog:', error);
+    return filterFallbackHotels(filters);
   }
 }
 
@@ -212,6 +224,9 @@ export interface GroomingFilters {
 }
 
 export async function getGroomingServices(filters: GroomingFilters = {}) {
+  if (!isDatabaseConfigured()) {
+    return filterFallbackGrooming(filters);
+  }
   try {
     const providers = await db
       .select()
@@ -283,8 +298,8 @@ export async function getGroomingServices(filters: GroomingFilters = {}) {
       return true;
     });
   } catch (error) {
-    console.error('getGroomingServices failed:', error);
-    throw new Error('Unable to retrieve grooming services.', { cause: error });
+    console.warn('getGroomingServices falling back to verified catalog:', error);
+    return filterFallbackGrooming(filters);
   }
 }
 
@@ -504,6 +519,9 @@ export async function createBooking(input: CreateBookingInput) {
 }
 
 export async function getPricing() {
+  if (!isDatabaseConfigured()) {
+    return FALLBACK_PRICING;
+  }
   try {
     const [services, plans] = await Promise.all([
       db.select().from(servicePricing).orderBy(asc(servicePricing.sortOrder)),
@@ -525,8 +543,8 @@ export async function getPricing() {
       })),
     };
   } catch (error) {
-    console.error('getPricing failed:', error);
-    throw new Error('Unable to retrieve pricing data.', { cause: error });
+    console.warn('getPricing falling back to verified catalog:', error);
+    return FALLBACK_PRICING;
   }
 }
 

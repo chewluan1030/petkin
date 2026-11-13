@@ -11,6 +11,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { parseJsonResponse } from '../lib/http';
 import type { PetSpecies } from '../types/api';
 import { ResilientImage } from './ResilientImage';
 
@@ -86,7 +87,7 @@ export function CustomerAccountDrawer({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(petForm),
       });
-      const data = await res.json();
+      const data = await parseJsonResponse<{ error?: string }>(res);
       if (!res.ok) throw new Error(data.error || 'Could not add pet.');
       setPetForm({
         name: '',

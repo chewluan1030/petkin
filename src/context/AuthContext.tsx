@@ -13,6 +13,7 @@ import {
   type User,
 } from 'firebase/auth';
 import { auth, googleAuthProvider } from '../lib/firebase';
+import { parseJsonResponse } from '../lib/http';
 import type { CustomerAccountData } from '../types/api';
 
 interface AuthContextValue {
@@ -45,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: { Authorization: `Bearer ${idToken}` },
       });
       if (res.ok) {
-        const data = (await res.json()) as CustomerAccountData;
+        const data = await parseJsonResponse<CustomerAccountData>(res);
         setAccountData(data);
       }
     } catch (err) {

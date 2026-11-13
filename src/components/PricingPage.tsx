@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Check, CheckCircle2, Info } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { parseJsonResponse } from '../lib/http';
 import type {
   MembershipPlanItem,
   NavTab,
@@ -25,19 +26,30 @@ export function PricingPage({
   >([]);
   const [plans, setPlans] = useState<MembershipPlanItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pricingError, setPricingError] = useState('');
   const [selectedSlug, setSelectedSlug] = useState<string>('paw-plus');
   const [savingPlan, setSavingPlan] = useState(false);
   const [planSavedMsg, setPlanSavedMsg] = useState('');
 
   const fetchPricing = useCallback(async () => {
     setLoading(true);
+    setPricingError('');
     try {
       const res = await fetch('/api/pricing');
-      const data = await res.json();
-      if (res.ok) {
-        setServiceCategories(data.serviceCategories || []);
-        setPlans(data.membershipPlans || []);
+      const data = await parseJsonResponse<{
+        serviceCategories?: ServicePricingItem[];
+        membershipPlans?: MembershipPlanItem[];
+        error?: string;
+      }>(res);
+      if (!res.ok) {
+        throw new Error(data.error || 'Unable to load pricing plans.');
       }
+      setServiceCategories(data.serviceCategories || []);
+      setPlans(data.membershipPlans || []);
+    } catch (err: unknown) {
+      setPricingError(
+        err instanceof Error ? err.message : 'Unable to load pricing data.'
+      );
     } finally {
       setLoading(false);
     }
@@ -123,6 +135,17 @@ export function PricingPage({
 
         {loading ? (
           <p className="text-sm text-[#57605A]">Loading live pricing...</p>
+        ) : pricingError && serviceCategories.length === 0 ? (
+          <div className="p-6 bg-white border border-[#E5E0D8] rounded-xl text-sm text-[#57605A] flex items-center justify-between gap-4">
+            <span>{pricingError}</span>
+            <button
+              type="button"
+              onClick={fetchPricing}
+              className="px-4 py-2 bg-[#4A6B53] hover:bg-[#3B5743] text-white text-xs font-semibold rounded-lg cursor-pointer shrink-0"
+            >
+              Retry
+            </button>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {serviceCategories.map((item) => (
@@ -166,6 +189,13 @@ export function PricingPage({
           </p>
         </div>
 
+        {loading ? (
+          <p className="text-sm text-[#57605A]">Loading membership plans...</p>
+        ) : pricingError && plans.length === 0 ? (
+          <div className="p-6 bg-white border border-[#E5E0D8] rounded-xl text-sm text-[#57605A]">
+            {pricingError}
+          </div>
+        ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-7 items-stretch">
           {plans.map((plan) => {
             const isSelected = activePlan?.slug === plan.slug;
@@ -233,6 +263,7 @@ export function PricingPage({
             );
           })}
         </div>
+        )}
 
         {/* Selection Summary */}
         {activePlan && (

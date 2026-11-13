@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CheckCircle2, ShieldAlert, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { parseJsonResponse } from '../lib/http';
 import type {
   BookingRecord,
   GroomingProviderListing,
@@ -101,7 +102,7 @@ export function AdminDashboardModal({
     setError('');
     try {
       const res = await authFetch('/api/admin/overview');
-      const data = await res.json();
+      const data = await parseJsonResponse<AdminOverview & { error?: string }>(res);
       if (!res.ok) throw new Error(data.error || 'Failed to load admin console.');
       setOverview(data);
       if (data.shelters?.length > 0) {

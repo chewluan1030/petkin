@@ -10,6 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { parseJsonResponse } from '../lib/http';
 import type {
   MatchRecommendation,
   NavTab,
@@ -108,7 +109,9 @@ export function FindPetPage({
       if (activeFilter === 'kids') params.set('goodWithKids', 'true');
 
       const res = await fetch(`/api/pets?${params.toString()}`);
-      const data = await res.json();
+      const data = await parseJsonResponse<{ pets?: PetListing[]; error?: string }>(
+        res
+      );
       if (!res.ok) throw new Error(data.error || 'Failed to load pets.');
       setPets(data.pets || []);
     } catch (err: unknown) {
@@ -157,7 +160,13 @@ export function FindPetPage({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(matcherForm),
       });
-      const data = await res.json();
+      const data = await parseJsonResponse<{
+        recommendations?: MatchRecommendation[];
+        source?: string;
+        disclaimer: string;
+        availablePets?: PetListing[];
+        error?: string;
+      }>(res);
       if (!res.ok) throw new Error(data.error || 'Could not compute AI matches.');
       setMatchResults({
         recommendations: data.recommendations || [],
@@ -237,7 +246,10 @@ export function FindPetPage({
           carePlan: enquiryForm.carePlan,
         }),
       });
-      const data = await res.json();
+      const data = await parseJsonResponse<{
+        enquiry: { referenceCode: string };
+        error?: string;
+      }>(res);
       if (!res.ok) throw new Error(data.error || 'Could not submit enquiry.');
       setEnquirySubmittedRef(data.enquiry.referenceCode);
       if (user) await refreshAccount();

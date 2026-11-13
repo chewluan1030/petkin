@@ -11,6 +11,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { parseJsonResponse } from '../lib/http';
 import type {
   BookingRecord,
   GroomingProviderListing,
@@ -112,9 +113,11 @@ export function ServicesPage({
       if (groomingDateFilter) params.set('date', groomingDateFilter);
 
       const res = await fetch(`/api/grooming?${params.toString()}`);
-      const data = await res.json();
+      const data = await parseJsonResponse<{
+        providers?: GroomingProviderListing[];
+      }>(res);
       if (res.ok) {
-        const list = (data.providers || []) as GroomingProviderListing[];
+        const list = data.providers || [];
         setGroomingProviders(list);
       }
     } finally {
@@ -143,9 +146,9 @@ export function ServicesPage({
       }
 
       const res = await fetch(`/api/hotels?${params.toString()}`);
-      const data = await res.json();
+      const data = await parseJsonResponse<{ hotels?: PetHotelListing[] }>(res);
       if (res.ok) {
-        setHotels((data.hotels || []) as PetHotelListing[]);
+        setHotels(data.hotels || []);
       }
     } finally {
       setHotelsLoading(false);
@@ -171,7 +174,7 @@ export function ServicesPage({
 
   useEffect(() => {
     fetch('/api/pricing')
-      .then((r) => r.json())
+      .then((r) => parseJsonResponse<{ membershipPlans?: MembershipPlanItem[] }>(r))
       .then((d) => setPlans(d.membershipPlans || []))
       .catch(() => {});
   }, [refreshKey]);
@@ -363,7 +366,10 @@ export function ServicesPage({
           addEnrichmentOrLateCare: addExtraCare,
         }),
       });
-      const data = await res.json();
+      const data = await parseJsonResponse<{
+        booking: BookingRecord;
+        error?: string;
+      }>(res);
       if (!res.ok) {
         throw new Error(data.error || 'Could not submit booking.');
       }
