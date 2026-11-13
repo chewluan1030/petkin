@@ -44,8 +44,8 @@ import chatHandler from './api/chat.ts';
 const app = express();
 app.use(express.json({ limit: '1mb' }));
 app.use(
-  '/src/assets/images',
-  express.static(path.resolve(process.cwd(), 'src/assets/images'))
+  '/images',
+  express.static(path.resolve(process.cwd(), 'public/images'))
 );
 
 app.all('/api/health', (req, res) => healthHandler(req, res));
@@ -465,8 +465,8 @@ app.post('/api/admin/pets', requireAuth, requireAdmin, async (req, res) => {
         photoUrl:
           String(photoUrl || '').trim() ||
           (petType === 'Cat'
-            ? '/src/assets/images/milo_ginger_cat_1794559410234.jpg'
-            : '/src/assets/images/kopi_singapore_dog_1794559410382.jpg'),
+            ? '/images/pet-milo-cat.jpg'
+            : '/images/pet-kopi-dog.jpg'),
         personality: String(personality),
         specialCare: String(specialCare),
         hdbSuitable: Boolean(hdbSuitable),
@@ -557,7 +557,7 @@ app.post('/api/admin/hotels', requireAuth, requireAdmin, async (req, res) => {
         location: String(location),
         acceptsDogs: Boolean(acceptsDogs),
         acceptsCats: Boolean(acceptsCats),
-        photoUrl: '/src/assets/images/sanctuary_pet_suites_1794559413937.jpg',
+        photoUrl: '/images/service-hotel-suites.jpg',
         roomTypes: [
           {
             name: String(roomName || 'Standard Comfort Suite'),
@@ -620,7 +620,7 @@ app.post('/api/admin/grooming', requireAuth, requireAdmin, async (req, res) => {
         location: String(location),
         servesDogs: Boolean(servesDogs),
         servesCats: Boolean(servesCats),
-        photoUrl: '/src/assets/images/calm_grooming_studio_1794559412119.jpg',
+        photoUrl: '/images/service-grooming-studio.jpg',
         packages: [
           {
             id: `pkg-${Date.now()}`,

@@ -21,10 +21,8 @@ import type {
 } from '../types/api';
 import { ResilientImage } from './ResilientImage';
 
-const GROOMING_STUDIO_IMAGE =
-  '/src/assets/images/calm_grooming_studio_1794559412119.jpg';
-const HOTEL_SUITES_IMAGE =
-  '/src/assets/images/sanctuary_pet_suites_1794559413937.jpg';
+const GROOMING_STUDIO_IMAGE = '/images/service-grooming-studio.jpg';
+const HOTEL_SUITES_IMAGE = '/images/service-hotel-suites.jpg';
 
 interface ServicesPageProps {
   onNavigate: (tab: NavTab) => void;
